@@ -6,7 +6,8 @@ const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
-    avatar: ''
+    avatar: '',
+    userType: 0
   }
 }
 
@@ -24,6 +25,9 @@ const mutations = {
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
+  },
+  SET_USER_TYPE: (state, userType) => {
+    state.userType = userType
   }
 }
 
@@ -34,7 +38,9 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
         const { data } = response
+        console.log(response);
         commit('SET_TOKEN', data.token)
+        commit('SET_USER_TYPE', data.useType)
         setToken(data.token)
         resolve()
       }).catch(error => {
@@ -53,9 +59,9 @@ const actions = {
           return reject('Verification failed, please Login again.')
         }
 
-        const { name, avatar } = data
+        const { realname, avatar } = data
 
-        commit('SET_NAME', name)
+        commit('SET_NAME', realname)
         commit('SET_AVATAR', avatar)
         resolve(data)
       }).catch(error => {
@@ -67,14 +73,14 @@ const actions = {
   // user logout
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
-      logout(state.token).then(() => {
+      // logout(state.token).then(() => {
         removeToken() // must remove  token  first
         resetRouter()
         commit('RESET_STATE')
         resolve()
-      }).catch(error => {
-        reject(error)
-      })
+      // }).catch(error => {
+      //   reject(error)
+      // })
     })
   },
 
