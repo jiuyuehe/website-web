@@ -17,9 +17,16 @@
         <el-input v-model="form.licCode" type="textarea"/>
       </el-form-item>
       <el-form-item label="添加模块" v-show="form.version == '4.6.0'">
-        <el-select style="width: 100%" v-model="form.modules" multiple clearable filterable>
-          <el-option v-for="item in modules" :value="item.code" :label="item.name">{{item.name}}</el-option>
-        </el-select>
+        <el-checkbox :indeterminate="isIndeterminate"  @change="handleCheckBaseChange" style="font-weight: bold">标准授权</el-checkbox>
+        <div style="margin: 15px 0;"></div>
+        <el-checkbox-group v-model="checkedModels" @change="handleCheckedChange">
+          <el-checkbox v-for="item in baseModules" :label="item.code" :key="item.code">{{item.name}}</el-checkbox>
+        </el-checkbox-group>
+
+        <el-checkbox :indeterminate="isextIndeterminate"  @change="handleCheckAllChange" style="font-weight: bold">扩展模块</el-checkbox>
+        <el-checkbox-group v-model="extCheckedModels" @change="handleExtCheckedChange">
+          <el-checkbox v-for="item in extModules" :label="item.code" :key="item.code">{{item.name}}</el-checkbox>
+        </el-checkbox-group>
       </el-form-item>
       <el-form-item label="企业名" prop="entName" v-if="form.type == 'create'"
                     :rules="{ required: true, message: '企业名不能为空', trigger: 'blur' }">
@@ -41,6 +48,7 @@
           <el-option label="一周" :value="7" />
           <el-option label="半个月" :value="15" />
           <el-option label="一个月" :value="30" />
+          <el-option label="三个月" :value="90" />
           <el-option label="永久" :value="0" v-if="isAdmin"/>
         </el-select>
       </el-form-item>
@@ -93,7 +101,7 @@
       return {
         form: {
           modules: [],
-          version: '4.5.0',
+          version: '4.6.0',
           type: 'create',
           licCode: '',
           entName: '',
@@ -104,7 +112,12 @@
           limitType: 0, // 0：最大用户数，1：并发数
           number: 3
         },
-        modules: [{
+        checkedModels :[],
+        extCheckedModels:[],
+        isextIndeterminate:false,
+        isIndeterminate:false,
+        baseModules: [
+          {
           "code": "person",
           "name": "个人空间"
         }, {
@@ -117,84 +130,87 @@
           "code": "group",
           "name": "群组空间"
         }, {
-          "code": "news",
-          "name": "门户空间"
-        }, {
           "code": "knowledge",
           "name": "知识库"
         }, {
           "code": "im",
           "name": "im聊天"
         }, {
-          "code": "forum",
-          "name": "群讨论"
-        }, {
-          "code": "note",
-          "name": "云笔记"
-        }, {
           "code": "label",
           "name": "文档标签"
         }, {
-          "code": "register",
-          "name": "用户注册"
-        }, {
-          "code": "code",
-          "name": "验证码"
-        }, {
-          "code": "smsCode",
-          "name": "短信验证码"
-        }, {
-          "code": "portal",
-          "name": "企业门户"
-        }, {
-          "code": "h5",
-          "name": "H5"
-        }, {
           "code": "shuiyin",
           "name": "文档水印"
-        }, {
-          "code": "template",
-          "name": "文档模板"
         }, {
           "code": "dingtalk",
           "name": "钉钉集成"
         }, {
           "code": "wechat",
           "name": "微信集成"
-        }, {
-          "code": "wxpub",
-          "name": "微信公众号集成"
-        }, {
+        },{
           "code": "ad",
           "name": "AD域集成"
-        }, {
-          "code": "mail",
-          "name": "邮件集成"
-        }, {
-          "code": "FTS",
-          "name": "全文检索"
-        }, {
-          "code": "officeOnline",
-          "name": "在线编辑"
-        }, {
-          "code": "exchange",
-          "name": "文件摆渡"
-        }, {
-          "code": "approval",
-          "name": "文档审批"
-        }, {
-          "code": "review",
-          "name": "文档审阅"
-        }, {
-          "code": "sensitive",
-          "name": "敏感词检测"
-        }, {
-          "code": "notice",
-          "name": "系统通知"
-        }, {
-          "code": "feedback",
-          "name": "用户反馈"
         }],
+        extModules: [
+          {
+            "code": "FTS",
+            "name": "全文检索"
+          }, {
+            "code": "officeOnline",
+            "name": "在线编辑"
+          }, {
+            "code": "exchange",
+            "name": "文件摆渡"
+          }, {
+            "code": "approval",
+            "name": "文档审批"
+          }, {
+            "code": "review",
+            "name": "文档审阅"
+          }, {
+            "code": "sensitive",
+            "name": "敏感词检测"
+          }, {
+            "code": "antivirus",
+            "name": "病毒查杀"
+          }, {
+            "code": "news",
+            "name": "系统通知"
+          }, {
+            "code": "forum",
+            "name": "群讨论"
+          }, {
+            "code": "note",
+            "name": "云笔记"
+          }, {
+            "code": "register",
+            "name": "用户注册"
+          }, {
+            "code": "code",
+            "name": "验证码"
+          }, {
+            "code": "smsCode",
+            "name": "短信验证码"
+          }, {
+            "code": "portal",
+            "name": "企业门户"
+          }, {
+            "code": "h5",
+            "name": "H5"
+          }, {
+            "code": "template",
+            "name": "文档模板"
+          },{
+            "code": "wxpub",
+            "name": "微信公众号集成"
+          }, {
+            "code": "mail",
+            "name": "邮件集成"
+          }, {
+            "code": "notice",
+            "name": "系统通知"
+          }
+          ],
         rules: {
           licCode: [{ required: true, message: '授权码不能为空', trigger: 'blur' }],
           number: [{ required: true, message: '授权数不能为空', trigger: 'blur' }],
@@ -213,6 +229,8 @@
           if (valid) {
             if(this.form.version == '4.5.0'){
               this.form.modules = undefined
+            }else {
+              this.form.modules = this.checkedModels.concat(this.extCheckedModels)
             }
             updateLic(this.form).then(response=>{
               this.$message({type: 'success', message: '成功!'})
@@ -246,7 +264,23 @@
           type: 'error'
         })
 
-      }
+      },
+      handleCheckAllChange(val) {
+        this.extCheckedModels = val ? this.extModules.map(item=>{return item.code}) : [];
+        this.isextIndeterminate = false;
+      },
+      handleCheckBaseChange(val) {
+        this.checkedModels = val ? this.baseModules.map(item=>{return item.code}) : [];
+        this.isIndeterminate = false;
+      },
+      handleCheckedChange(value) {
+        let checkedCount = value.length;
+        this.isIndeterminate = checkedCount > 0 && checkedCount < this.baseModules.length;
+      },
+      handleExtCheckedChange(value) {
+        let checkedCount = value.length;
+        this.isextIndeterminate = checkedCount > 0 && checkedCount < this.extModules.length;
+      },
     }
   }
 </script>
